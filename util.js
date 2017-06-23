@@ -98,12 +98,12 @@ let rename = (from, to) =>{
   });
 };
 
-let compress = () =>{
+let compress = (qua=70) =>{
   return new Promise((resolve, reject)=>{
     imagemin(['./*.{jpg,png}'], './', {
   	   plugins: [
   	       imageminJpegtran(),
-  	       imageminPngquant({quality: '60-70'})
+  	       imageminPngquant({quality: qua})
   	   ]
   	}).then(files => {
   	   resolve(true);
@@ -147,7 +147,7 @@ let validate = () =>{
       }
     });
     if(sizeBanner>100||sizeBackup>40){
-      return false
+      return false;
     }
     return true;
 };

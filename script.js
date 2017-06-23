@@ -35,7 +35,16 @@ switch (cli.input[0]) {
 		doThatThing.push(Util.makeBackupSet());
 		break;
 	case 'compress':
-		doThatThing.push(Util.compress());
+		if(cli.input.length == 2){
+			if(Number.isInteger(cli.input[1]) && cli.input[1] < 95)
+				doThatThing.push(Util.compress(cli.input[1]));
+			else{
+				console.error('Input error');
+				process.exit(1);
+			}
+		}else{
+			doThatThing.push(Util.compress());
+		}
 		break;
 	case 'rename':
 		doThatThing.push(Util.rename('-min.','.'));
