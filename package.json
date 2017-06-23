@@ -1,6 +1,6 @@
 {
   "name": "html5banner-cli",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "compress image, renamer, and validator for html 5 banner",
   "main": "script.js",
   "scripts": {

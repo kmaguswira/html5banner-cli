@@ -1,4 +1,3 @@
-const AdmZip = require('adm-zip');
 const EasyZip = require('easy-zip').EasyZip;
 const fs = require('fs');
 const Pageres = require('pageres');
