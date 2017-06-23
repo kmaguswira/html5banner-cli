@@ -1,4 +1,5 @@
 const AdmZip = require('adm-zip');
+const EasyZip = require('easy-zip').EasyZip;
 const fs = require('fs');
 const Pageres = require('pageres');
 const imagemin = require('imagemin');
@@ -8,31 +9,34 @@ const imageminPngquant = require('imagemin-pngquant');
 let trustme = () => {
   return new Promise((resolve, reject)=>{
     fs.readdirSync(`./`).forEach(file => {
-  		if(fs.statSync(`./${file}`).isDirectory()){
-  			let zip = new AdmZip();
-        let size = false;
+  		if(fs.statSync(`./${file}`).isDirectory()&&file=='300x250'){
+  			let zip = new EasyZip();
+        let filesToZip = [];
   			fs.readdirSync(`./${file}`).forEach(fileInFolder => {
-  				if(!fileInFolder.includes('DS_Store')||!fileInFolder.includes('RECYCLER')){
+  				if((!fileInFolder.includes('DS_Store')||!fileInFolder.includes('RECYCLER'))&&
+            !fs.statSync(`./${file}/${fileInFolder}`).isDirectory()
+            ){
   					if(fileInFolder.toLowerCase().includes('.html')){
               let makeBackupImage = makeBackup(`./${file}/`, `${fileInFolder}`, `${file.split('x')[0]}`, `${file.split('x')[1]}`);
+              //async
               makeBackupImage.then((done)=>{
-                let input1 = fs.readFileSync(`./${file}/${fileInFolder}`);
-      					zip.addFile(fileInFolder, input1, '', 0644);
-                let input2 = fs.readFileSync(`./${file}/backup_image.jpg`);
-                zip.addFile(fileInFolder, input2, '', 0644);
+                filesToZip.push({source:`./${file}/${fileInFolder}`, target:fileInFolder});
+                filesToZip.push({source:`./${file}/backup_image.jpg`, target:`backup_image.jpg`});
               }).catch((err)=>{
                 console.log(err);
                 reject(err);
               });
             }
-  					let input = fs.readFileSync(`./${file}/${fileInFolder}`);
-  					zip.addFile(fileInFolder, input, '', 0644);
+            filesToZip.push({source:`./${file}/${fileInFolder}`, target:`${fileInFolder}`});
   				}
   			});
-        if(!size)
+        //async rejected
+        if(validate()){
+          zip.batchAdd(filesToZip,function(){
+              zip.writeToFile(`./${file}.zip`);
+          });
+        }else{
           reject(`Maximum size exceed ${file}`);
-        else{
-          zip.writeZip(`./${file}.zip`);
         }
   		}
   	});
@@ -113,14 +117,19 @@ let zip = () =>{
   return new Promise((resolve, reject)=>{
     fs.readdirSync(`./`).forEach(file => {
       if(fs.statSync(`./${file}`).isDirectory()){
-        let zip = new AdmZip();
+        let zip = new EasyZip();
+        let filesToZip = [];
         fs.readdirSync(`./${file}`).forEach(fileInFolder => {
-  				if(!fileInFolder.includes('DS_Store')||!fileInFolder.includes('RECYCLER')){
-            let input = fs.readFileSync(`./${file}/${fileInFolder}`);
-  					zip.addFile(fileInFolder, input, '', 0644);
+  				if(
+            (!fileInFolder.includes('DS_Store')||!fileInFolder.includes('RECYCLER'))&&
+            !fs.statSync(`./${file}/${fileInFolder}`).isDirectory()
+            ){
+            filesToZip.push({source:`./${file}/${fileInFolder}`, target:`${fileInFolder}`});
           }
         });
-        zip.writeZip(`./${file}.zip`);
+        zip.batchAdd(filesToZip,function(){
+            zip.writeToFile(`./${file}.zip`);
+        });
       }
     });
     resolve(true);
@@ -128,7 +137,6 @@ let zip = () =>{
 };
 
 let validate = () =>{
-  return new Promise((resolve, reject)=>{
     let sizeBanner = 0;
     let sizeBackup = 0;
     fs.readdirSync(`./`).forEach(file => {
@@ -138,10 +146,10 @@ let validate = () =>{
         sizeBanner+=getSize(`./${file}`);
       }
     });
-    if(sizeBanner>100||sizeBackup>40)
-      reject(`Not Valid! Banner size = ${sizeBanner} and Backup image = ${sizeBackup}`);
-    resolve(true);
-  });
+    if(sizeBanner>100||sizeBackup>40){
+      return false
+    }
+    return true;
 };
 
 let getSize = (filename) => {

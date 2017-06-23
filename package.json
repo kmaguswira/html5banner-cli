@@ -1,6 +1,6 @@
 {
   "name": "html5banner-cli",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "compress image, renamer, and validator for html 5 banner",
   "main": "script.js",
   "scripts": {
@@ -13,16 +13,16 @@
   "engines": {
     "node": ">=4"
   },
-  "repository" :
-  { "type" : "git", 
-	"url" : "https://github.com/kmaguswira/html5banner-cli.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kmaguswira/html5banner-cli.git"
   },
   "author": "kmaguswira",
-  "url" : "https://github.com/kmaguswira/html5banner-cli/issues",
-  "email" : "km.aguswira@gmail.com",
+  "url": "https://github.com/kmaguswira/html5banner-cli/issues",
+  "email": "km.aguswira@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "adm-zip": "^0.4.7",
+    "easy-zip": "0.0.4",
     "imagemin": "^5.3.1",
     "imagemin-jpegtran": "^5.0.2",
     "imagemin-pngquant": "^5.0.1",
